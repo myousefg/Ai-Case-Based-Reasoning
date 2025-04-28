@@ -1,3 +1,6 @@
+# CASE BASED - REASONING - TOP 5 RESTORAN
+# Anggota : Mohammed Yousef Gumilar (1302220085) - Muhammad Ghiyats Fatiha (1302220109) 
+
 # Import library - pandas untuk membaca file restoran.xlsx
 import pandas as pd
 
@@ -18,31 +21,31 @@ def triangular(x, a, b, c):
     else:
         return (c - x) / (c - b)
 
-# Fuzzification - Definisi batas Kualitas Servis
-def servis_membership(x):
+# Fuzzification - menefinisikan batas Kualitas Servis
+def kualitas_servis(x):
     return {
         'Buruk': triangular(x, 0, 20, 40),
         'Sedang': triangular(x, 30, 50, 70),
         'Bagus': triangular(x, 60, 80, 100)
     }
 
-# Fuzzification - Definisi batas Harga
-def harga_membership(x):
+# Fuzzification - menefinisikan batas Harga
+def harga(x):
     return {
         'Murah': triangular(x, 25000, 25000, 35000),
         'Sedang': triangular(x, 30000, 40000, 50000),
         'Mahal': triangular(x, 45000, 55000, 55000)
     }
 
-# Inferensi	- Definisi batas Kelayakan Skor
-output_terms = {
+# Inferensi	- mendefinisikan batas Kelayakan Skor
+kelayakan_skor = {
     'Rendah': (0, 0, 50),
     'Sedang': (0, 50, 100),
     'Tinggi': (50, 100, 100)
 }
 
-# Inferensi - Definisi aturan fuzzy
-rules = [
+# Inferensi - mendefinisikan aturan fuzzy
+aturan = [
     ('Bagus', 'Murah', 'Tinggi'),
     ('Bagus', 'Sedang', 'Tinggi'),
     ('Bagus', 'Mahal', 'Sedang'),
@@ -54,14 +57,14 @@ rules = [
     ('Buruk', 'Mahal', 'Rendah')
 ]
 
-# Defuzzification - Menghitung nilai keanggotaan untuk setiap aturan
+# Defuzzification - menghitung nilai keanggotaan untuk setiap aturan
 def compute_eligibility_score(servis_value, harga_value):
-    m_serv = servis_membership(servis_value)
-    m_harga = harga_membership(harga_value)
+    m_serv = kualitas_servis(servis_value)
+    m_harga = harga(harga_value)
 
     output_strength = {'Rendah': 0.0, 'Sedang': 0.0, 'Tinggi': 0.0}
     
-    for serv_term, hrg_term, out_term in rules:
+    for serv_term, hrg_term, out_term in aturan:
         strength = min(m_serv[serv_term], m_harga[hrg_term])
         if strength > output_strength[out_term]:
             output_strength[out_term] = strength
@@ -73,7 +76,7 @@ def compute_eligibility_score(servis_value, harga_value):
     
     for x in x_values:
         memberships = []
-        for term, (a, b, c) in output_terms.items():
+        for term, (a, b, c) in kelayakan_skor.items():
             base = triangular(x, a, b, c)
             clipped = min(output_strength[term], base)
             memberships.append(clipped)
