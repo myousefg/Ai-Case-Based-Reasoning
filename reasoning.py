@@ -18,7 +18,7 @@ def triangular(x, a, b, c):
     else:
         return (c - x) / (c - b)
 
-# Definisi batas Kualitas Servis
+# Fuzzification - Definisi batas Kualitas Servis
 def servis_membership(x):
     return {
         'Buruk': triangular(x, 0, 20, 40),
@@ -26,7 +26,7 @@ def servis_membership(x):
         'Bagus': triangular(x, 60, 80, 100)
     }
 
-# Definisi batas Harga
+# Fuzzification - Definisi batas Harga
 def harga_membership(x):
     return {
         'Murah': triangular(x, 25000, 25000, 35000),
@@ -34,14 +34,14 @@ def harga_membership(x):
         'Mahal': triangular(x, 45000, 55000, 55000)
     }
 
-# Output fuzzy sets for eligibility
+# Inferensi	- Definisi batas Kelayakan Skor
 output_terms = {
     'Rendah': (0, 0, 50),
     'Sedang': (0, 50, 100),
     'Tinggi': (50, 100, 100)
 }
 
-# Fuzzyfication - Definisi aturan fuzzy
+# Inferensi - Definisi aturan fuzzy
 rules = [
     ('Bagus', 'Murah', 'Tinggi'),
     ('Bagus', 'Sedang', 'Tinggi'),
@@ -54,6 +54,7 @@ rules = [
     ('Buruk', 'Mahal', 'Rendah')
 ]
 
+# Defuzzification - Menghitung nilai keanggotaan untuk setiap aturan
 def compute_eligibility_score(servis_value, harga_value):
     m_serv = servis_membership(servis_value)
     m_harga = harga_membership(harga_value)
@@ -98,9 +99,9 @@ if __name__ == "__main__":
     top5.columns = ['Id', 'Kualitas Servis', 'Harga', 'Kelayakan Skor']
     top5.reset_index(drop=True, inplace=True)
     top5.insert(0, 'No.', top5.index + 1)
-
+    # menyimpan output ke file
     top5.to_excel('peringkat.xlsx', index=False)
-
+    # styling file excel agar rapih
     wb = openpyxl.load_workbook('peringkat.xlsx')
     ws = wb.active
     border = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
@@ -109,6 +110,5 @@ if __name__ == "__main__":
     for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
         for cell in row:
             cell.border, cell.alignment = border, align_center
-
     wb.save('peringkat.xlsx')
-    print("Top 5 restaurants saved to peringkat.xlsx with centered text and borders.")
+    print("Top 5 tersimpan ke peringkat.xlsx")
